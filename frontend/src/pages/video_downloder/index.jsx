@@ -201,6 +201,7 @@ export default function VideoDownloader() {
 
             <div className="p-6 md:p-10">
 
+              {/* URL INPUT */}
               <div className="relative group mb-6">
 
                 <div className="absolute inset-y-0 left-4 md:left-5 flex items-center pointer-events-none">
@@ -234,6 +235,36 @@ export default function VideoDownloader() {
 
               </div>
 
+              {/* QUALITY SELECTOR */}
+              <div className="grid grid-cols-3 md:grid-cols-5 gap-2 mb-6">
+
+                {QUALITY_OPTIONS.map((q)=>(
+                  
+                  <button
+                    key={q.value}
+                    onClick={()=>setQuality(q.value)}
+                    className={`p-3 rounded-xl border text-left transition
+                    ${quality === q.value
+                      ? "border-blue-600 bg-blue-50"
+                      : "border-slate-200 bg-white"}
+                    `}
+                  >
+
+                    <div className="text-sm font-bold">
+                      {q.label}
+                    </div>
+
+                    <div className="text-[10px] text-slate-500">
+                      {q.sub}
+                    </div>
+
+                  </button>
+
+                ))}
+
+              </div>
+
+              {/* FETCH BUTTON */}
               <button
                 onClick={fetchVideo}
                 disabled={loading || !url.trim()}
@@ -254,10 +285,10 @@ export default function VideoDownloader() {
 
             <div ref={resultRef} className="p-6 md:p-10 border-t border-slate-100">
 
-              <div className="w-full rounded-2xl overflow-hidden bg-black">
+              <div className="w-full max-w-md mx-auto rounded-xl overflow-hidden bg-black">
 
                 {previewLoading && (
-                  <div className="flex items-center justify-center h-60 text-white text-sm">
+                  <div className="flex items-center justify-center h-40 text-white text-sm">
                     Loading Preview...
                   </div>
                 )}
@@ -268,12 +299,12 @@ export default function VideoDownloader() {
                     controls
                     playsInline
                     preload="metadata"
-                    className="w-full h-auto"
+                    className="w-full max-h-[660px] object-contain"
                   />
                 )}
 
                 {!previewUrl && !previewLoading && (
-                  <div className="flex items-center justify-center h-60 text-white text-sm">
+                  <div className="flex items-center justify-center h-40 text-white text-sm">
                     Preview not available
                   </div>
                 )}
