@@ -10,7 +10,7 @@ const app = express()
 app.use(cors({
   origin: [
     "https://video.teckvora.com",
-    "http://localhost:4001"
+    "http://localhost:5173"
   ],
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"]
