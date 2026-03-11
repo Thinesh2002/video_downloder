@@ -3,21 +3,10 @@ import API from "../../config/api";
 import {
   Download,
   Link2,
-  RefreshCcw,
-  CheckCircle2,
-  AlertCircle
+  RefreshCcw
 } from "lucide-react";
 
 const DIRECT_PREVIEW = ["instagram", "vimeo"];
-
-const PLATFORMS = [
-  { name: "YouTube", icon: "▶", color: "bg-red-500 shadow-red-200" },
-  { name: "Instagram", icon: "◈", color: "bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-600 shadow-pink-200" },
-  { name: "TikTok", icon: "♪", color: "bg-slate-900 shadow-slate-300" },
-  { name: "Pinterest", icon: "⊕", color: "bg-red-600 shadow-red-200" },
-  { name: "Twitter/X", icon: "✕", color: "bg-black shadow-slate-400" },
-  { name: "Facebook", icon: "ƒ", color: "bg-blue-600 shadow-blue-200" }
-];
 
 const QUALITY_OPTIONS = [
   { value: "best", label: "Best", sub: "Max Quality" },
@@ -187,15 +176,9 @@ export default function VideoDownloader() {
 
   return (
 
-    <div
-      className="bg-[#F8FAFC] min-h-screen relative overflow-hidden font-sans pb-20 touch-pan-y"
-      onClick={(e)=>e.stopPropagation()}
-      onMouseDown={(e)=>e.stopPropagation()}
-    >
+    <div className="bg-[#F8FAFC] min-h-screen relative overflow-hidden font-sans pb-20 touch-pan-y">
 
       <div className="relative z-10 flex flex-col items-center px-4 pt-8 md:pt-12">
-
-        {/* HEADER */}
 
         <div className="text-center mb-6 md:mb-10">
 
@@ -207,7 +190,7 @@ export default function VideoDownloader() {
           </h1>
 
           <p className="text-slate-500 mt-4 text-sm md:text-[15px] font-medium max-w-md mx-auto px-4">
-            Save content from your favorite platforms in 4K instantly.
+            Save content from your favorite platforms instantly.
           </p>
 
         </div>
@@ -228,29 +211,18 @@ export default function VideoDownloader() {
                   ref={inputRef}
                   type="text"
                   value={url}
-                  autoComplete="off"
-                  autoCorrect="off"
-                  autoCapitalize="none"
-                  spellCheck="false"
-                  onClick={(e)=>{
-                    e.stopPropagation();
-                    inputRef.current?.focus();
-                  }}
-                  onMouseDown={(e)=>e.stopPropagation()}
-                  onTouchStart={(e)=>e.stopPropagation()}
                   onChange={(e)=>{
                     setUrl(e.target.value);
                     setError("");
                   }}
                   onKeyDown={(e)=>{
-                    e.stopPropagation();
                     if(e.key==="Enter"){
                       e.preventDefault();
                       fetchVideo();
                     }
                   }}
                   placeholder="Paste video URL here..."
-                  className="w-full bg-white/50 border-2 border-slate-100 rounded-2xl pl-12 md:pl-14 pr-24 md:pr-28 py-4 md:py-5 text-slate-900 font-medium focus:outline-none focus:border-blue-500 focus:bg-white transition-all shadow-sm text-sm md:text-base"
+                  className="w-full bg-white border-2 border-slate-100 rounded-2xl pl-12 md:pl-14 pr-24 md:pr-28 py-4 md:py-5 text-slate-900 font-medium focus:outline-none focus:border-blue-500 transition-all shadow-sm text-sm md:text-base"
                 />
 
                 <button
@@ -272,6 +244,56 @@ export default function VideoDownloader() {
                   ? <RefreshCcw className="animate-spin" size={20}/>
                   : "Fetch Content"}
 
+              </button>
+
+            </div>
+
+          )}
+
+          {videoUrl && (
+
+            <div ref={resultRef} className="p-6 md:p-10 border-t border-slate-100">
+
+              <div className="w-full rounded-2xl overflow-hidden bg-black">
+
+                {previewLoading && (
+                  <div className="flex items-center justify-center h-60 text-white text-sm">
+                    Loading Preview...
+                  </div>
+                )}
+
+                {previewUrl && (
+                  <video
+                    src={previewUrl}
+                    controls
+                    playsInline
+                    preload="metadata"
+                    className="w-full h-auto"
+                  />
+                )}
+
+                {!previewUrl && !previewLoading && (
+                  <div className="flex items-center justify-center h-60 text-white text-sm">
+                    Preview not available
+                  </div>
+                )}
+
+              </div>
+
+              <button
+                onClick={downloadVideo}
+                disabled={downloading}
+                className="mt-6 w-full py-4 bg-blue-600 text-white rounded-xl font-bold flex items-center justify-center gap-2"
+              >
+                <Download size={18}/>
+                {downloading ? "Downloading..." : "Download Video"}
+              </button>
+
+              <button
+                onClick={clearAll}
+                className="mt-4 w-full py-3 bg-slate-200 text-slate-700 rounded-xl font-semibold"
+              >
+                Download Another Video
               </button>
 
             </div>

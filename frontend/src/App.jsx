@@ -2,7 +2,7 @@ import React from "react";
 import { Routes, Route } from "react-router-dom";
 
 import Layout from "./compnents/Layout";
-import VideoDownload from "./Pages/video_download/index";
+import VideoDownload from "./pages/video_downloder/index";
 
 import "./index.css";
 
