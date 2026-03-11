@@ -22,7 +22,8 @@ function detectPlatform(url) {
 
 function runYtDlp(args, timeout = 30000) {
   return new Promise((resolve, reject) => {
-    const proc = spawn("python", ["-m", "yt_dlp", ...args])
+
+    const proc = spawn("python3", ["-m", "yt_dlp", ...args])
 
     let stdout = ""
     let stderr = ""
@@ -32,23 +33,25 @@ function runYtDlp(args, timeout = 30000) {
       reject(new Error("Process timeout"))
     }, timeout)
 
-    proc.stdout.on("data", (data) => {
+    proc.stdout.on("data", data => {
       stdout += data.toString()
     })
 
-    proc.stderr.on("data", (data) => {
+    proc.stderr.on("data", data => {
       stderr += data.toString()
     })
 
-    proc.on("close", (code) => {
+    proc.on("close", code => {
       clearTimeout(timer)
       if (code === 0) resolve(stdout)
       else reject(new Error(stderr || "yt-dlp failed"))
     })
+
   })
 }
 
 exports.getVideoInfo = async (url) => {
+
   const output = await runYtDlp(["--dump-json", "--no-playlist", url])
   const info = JSON.parse(output)
 
@@ -60,8 +63,8 @@ exports.getVideoInfo = async (url) => {
     uploader: info.uploader || info.channel || null,
     view_count: info.view_count || null,
     formats: (info.formats || [])
-      .filter((f) => f.vcodec !== "none" && f.ext !== "mhtml")
-      .map((f) => ({
+      .filter(f => f.vcodec !== "none" && f.ext !== "mhtml")
+      .map(f => ({
         format_id: f.format_id,
         ext: f.ext,
         resolution: f.resolution || `${f.width || "?"}x${f.height || "?"}`,
@@ -73,6 +76,7 @@ exports.getVideoInfo = async (url) => {
 }
 
 exports.getVideoUrl = async (url, quality = "best") => {
+
   const platform = detectPlatform(url)
 
   if (platform === "unknown") {
@@ -89,7 +93,13 @@ exports.getVideoUrl = async (url, quality = "best") => {
 
   const format = formatMap[quality] || formatMap.best
 
-  const output = await runYtDlp(["-f", format, "--get-url", "--no-playlist", url])
+  const output = await runYtDlp([
+    "-f",
+    format,
+    "--get-url",
+    "--no-playlist",
+    url
+  ])
 
   const urls = output.trim().split("\n").filter(Boolean)
 
@@ -103,6 +113,7 @@ exports.getVideoUrl = async (url, quality = "best") => {
 }
 
 exports.downloadToServer = async (url, quality = "best", outputDir = "./downloads") => {
+
   const platform = detectPlatform(url)
 
   if (platform === "unknown") {
@@ -126,23 +137,20 @@ exports.downloadToServer = async (url, quality = "best", outputDir = "./download
 
   const outputTemplate = path.join(outputDir, `${platform}_${timestamp}.%(ext)s`)
 
-  await runYtDlp(
-    [
-      "-f",
-      format,
-      "--merge-output-format",
-      "mp4",
-      "--no-playlist",
-      "-o",
-      outputTemplate,
-      url,
-    ],
-    120000
-  )
+  await runYtDlp([
+    "-f",
+    format,
+    "--merge-output-format",
+    "mp4",
+    "--no-playlist",
+    "-o",
+    outputTemplate,
+    url
+  ], 120000)
 
   const files = fs
     .readdirSync(outputDir)
-    .filter((f) => f.startsWith(`${platform}_${timestamp}`))
+    .filter(f => f.startsWith(`${platform}_${timestamp}`))
 
   if (!files.length) throw new Error("Downloaded file not found")
 
@@ -160,12 +168,13 @@ exports.downloadToServer = async (url, quality = "best", outputDir = "./download
 }
 
 exports.cleanOldFiles = (outputDir = "./downloads", maxAgeMs = 30 * 60 * 1000) => {
+
   if (!fs.existsSync(outputDir)) return
 
   const now = Date.now()
   const files = fs.readdirSync(outputDir)
 
-  files.forEach((file) => {
+  files.forEach(file => {
     const filepath = path.join(outputDir, file)
     const stat = fs.statSync(filepath)
 
