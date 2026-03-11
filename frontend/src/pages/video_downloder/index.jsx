@@ -195,6 +195,7 @@ export default function VideoDownloader() {
 
         </div>
 
+        {/* MAIN DOWNLOADER CARD */}
         <div className="w-full max-w-2xl bg-white/70 backdrop-blur-2xl border border-white/50 rounded-[2rem] md:rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.04)] overflow-hidden">
 
           {!videoUrl && (
@@ -330,6 +331,38 @@ export default function VideoDownloader() {
             </div>
 
           )}
+
+        </div>
+
+        {/* SEO CONTENT SECTION */}
+        <div className="max-w-4xl mx-auto mt-20 px-6 text-slate-700 leading-relaxed">
+
+          <h2 className="text-3xl font-bold text-slate-900 mb-6">
+            Free Online Video Downloader
+          </h2>
+
+          <p className="mb-4">
+            This free online video downloader allows you to download videos
+            from popular social media platforms such as Instagram, TikTok,
+            YouTube, Facebook and Vimeo.
+          </p>
+
+          <p className="mb-6">
+            Simply paste the video link above, select your preferred
+            quality and download the video instantly.
+          </p>
+
+          <h3 className="text-2xl font-semibold text-slate-900 mb-4">
+            How to Use
+          </h3>
+
+          <ol className="list-decimal pl-6 space-y-2">
+            <li>Copy the video link from the social media platform.</li>
+            <li>Paste the link into the input box above.</li>
+            <li>Select the quality you want.</li>
+            <li>Click Fetch Content.</li>
+            <li>Preview and download the video.</li>
+          </ol>
 
         </div>
 
