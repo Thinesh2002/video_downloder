@@ -1,7 +1,9 @@
 import axios from "axios";
 
+export const API_BASE_URL = "https://video-api.teckvora.com";
+
 const API = axios.create({
-  baseURL: "http://localhost:4001/api",
+  baseURL: `${API_BASE_URL}/api`,
 });
 
 export default API;
