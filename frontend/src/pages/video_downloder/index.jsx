@@ -413,7 +413,7 @@ export default function VideoDownloader() {
               )}
 
               {!previewUrl && !previewLoading && (
-                <div className="flex flex-col items-center justify-center h-40 gap-2">
+                <div className="flex flex-col items-center justify-center h-540 gap-2">
                   <Video size={28} className="text-stone-600" />
                   <p className="text-stone-500 text-[13px] font-sans">Preview not available</p>
                 </div>
