@@ -23,7 +23,7 @@ function detectPlatform(url) {
 function runYtDlp(args, timeout = 30000) {
   return new Promise((resolve, reject) => {
 
-    const proc = spawn("python3", ["-m", "yt_dlp", ...args])
+    const proc = spawn("/usr/bin/yt-dlp", args)
 
     let stdout = ""
     let stderr = ""
