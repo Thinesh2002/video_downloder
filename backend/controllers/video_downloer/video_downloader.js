@@ -10,41 +10,96 @@ const fs = require("fs")
 
 const DOWNLOADS_DIR = path.join(__dirname, "../downloads")
 
+// ==========================
+// COMMON VALIDATOR
+// ==========================
+const validateUrl = (url) => {
+  try {
+    new URL(url)
+    return true
+  } catch {
+    return false
+  }
+}
+
+// ==========================
+// SIMPLE RATE LIMIT (IP)
+// ==========================
+const rateLimitMap = new Map()
+const LIMIT = 15
+const WINDOW = 60 * 1000
+
+const checkRateLimit = (ip) => {
+  const now = Date.now()
+  if (!rateLimitMap.has(ip)) {
+    rateLimitMap.set(ip, [])
+  }
+
+  const requests = rateLimitMap.get(ip).filter(t => now - t < WINDOW)
+
+  if (requests.length >= LIMIT) return false
+
+  requests.push(now)
+  rateLimitMap.set(ip, requests)
+  return true
+}
+
+// ==========================
+// VIDEO INFO
+// ==========================
 exports.videoInfo = async (req, res) => {
   const { url } = req.query
+  const ip = req.ip
+
+  if (!checkRateLimit(ip)) {
+    return res.status(429).json({ success: false, message: "Too many requests" })
+  }
 
   if (!url) {
     return res.status(400).json({ success: false, message: "url query param required" })
   }
 
-  try {
-    new URL(url)
-  } catch {
+  if (!validateUrl(url)) {
     return res.status(400).json({ success: false, message: "Invalid URL format" })
   }
 
   try {
     const info = await getVideoInfo(url)
-    res.json({ success: true, data: info })
+
+    res.json({
+      success: true,
+      data: info,
+    })
   } catch (err) {
-    res.status(500).json({ success: false, error: "INFO_FAILED", message: err.message })
+    res.status(500).json({
+      success: false,
+      error: "INFO_FAILED",
+      message: err.message,
+    })
   }
 }
 
+// ==========================
+// GET DIRECT URL
+// ==========================
 exports.getUrl = async (req, res) => {
-  const { url, quality = "best" } = req.body
+  const { url, quality = "best", format = "mp4" } = req.body
+  const ip = req.ip
+
+  if (!checkRateLimit(ip)) {
+    return res.status(429).json({ success: false, message: "Too many requests" })
+  }
 
   if (!url) {
     return res.status(400).json({ success: false, message: "url is required" })
   }
 
-  try {
-    new URL(url)
-  } catch {
+  if (!validateUrl(url)) {
     return res.status(400).json({ success: false, message: "Invalid URL format" })
   }
 
   const validQualities = ["best", "high", "medium", "low", "audio"]
+  const validFormats = ["mp4", "mp3"]
 
   if (!validQualities.includes(quality)) {
     return res.status(400).json({
@@ -53,32 +108,55 @@ exports.getUrl = async (req, res) => {
     })
   }
 
+  if (!validFormats.includes(format)) {
+    return res.status(400).json({
+      success: false,
+      message: `Invalid format. Choose from: ${validFormats.join(", ")}`,
+    })
+  }
+
   try {
-    const data = await getVideoUrl(url, quality)
-    res.json({ success: true, data })
+    const data = await getVideoUrl(url, quality, format)
+
+    res.json({
+      success: true,
+      quality,
+      format,
+      data,
+    })
   } catch (err) {
-    res.status(500).json({ success: false, error: "URL_EXTRACTION_FAILED", message: err.message })
+    res.status(500).json({
+      success: false,
+      error: "URL_EXTRACTION_FAILED",
+      message: err.message,
+    })
   }
 }
 
+// ==========================
+// DOWNLOAD VIDEO (IMPROVED)
+// ==========================
 exports.downloadVideo = async (req, res) => {
-  const { url, quality = "best" } = req.body
+  const { url, quality = "best", format = "mp4" } = req.body
+  const ip = req.ip
+
+  if (!checkRateLimit(ip)) {
+    return res.status(429).json({ success: false, message: "Too many requests" })
+  }
 
   if (!url) {
     return res.status(400).json({ success: false, message: "url is required" })
   }
 
-  try {
-    new URL(url)
-  } catch {
+  if (!validateUrl(url)) {
     return res.status(400).json({ success: false, message: "Invalid URL format" })
   }
 
   try {
-    const result = await downloadToServer(url, quality, DOWNLOADS_DIR)
+    const result = await downloadToServer(url, quality, DOWNLOADS_DIR, format)
 
     res.setHeader("Content-Disposition", `attachment; filename="${result.filename}"`)
-    res.setHeader("Content-Type", "video/mp4")
+    res.setHeader("Content-Type", format === "mp3" ? "audio/mpeg" : "video/mp4")
     res.setHeader("Content-Length", result.filesize)
 
     const stream = fs.createReadStream(result.filepath)
@@ -94,6 +172,7 @@ exports.downloadVideo = async (req, res) => {
     })
 
     stream.pipe(res)
+
   } catch (err) {
     const status =
       err.message.includes("Unsupported") ? 422 :
@@ -108,6 +187,9 @@ exports.downloadVideo = async (req, res) => {
   }
 }
 
+// ==========================
+// CLEANUP
+// ==========================
 exports.cleanup = (req, res) => {
   try {
     cleanOldFiles(DOWNLOADS_DIR)

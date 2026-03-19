@@ -8,8 +8,8 @@ export default function Layout({ children }) {
       <Header />
 
       {/* Main Content */}
-      <main className="h-[calc(100vh-4rem)] overflow-y-auto p-4 sm:p-8 scroll-smooth">
-        <div className="max-w-[1600px] mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <main className="h-[calc(100vh-4rem)] overflow-y-auto scroll-smooth">
+        <div className="  animate-in fade-in slide-in-from-bottom-4 duration-500">
           {children}
         </div>
       </main>
