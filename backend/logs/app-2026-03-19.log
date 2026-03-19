@@ -1,3 +1,23 @@
 10:48:19 [[31merror[39m] [31myt-dlp not found. Install: pip install yt-dlp[39m
 10:48:20 [[32minfo[39m] [32mffmpeg resolved: ffmpeg[39m
 10:48:23 [[32minfo[39m] [32m🚀 Server running → http://0.0.0.0:4001 [development][39m
+10:51:34 [[32minfo[39m] [32myt-dlp resolved: yt-dlp[39m
+10:51:34 [[32minfo[39m] [32mffmpeg resolved: ffmpeg[39m
+10:52:17 [[32minfo[39m] [32m{[39m
+[32m  event: 'get_url',[39m
+[32m  url: 'https://pin.it/3AIT91YCQ',[39m
+[32m  quality: 'best',[39m
+[32m  ip: '::1',[39m
+[32m  requestId: 'a531f1d4-e4bb-45e9-a397-2ad6aa1e08b3'[39m
+[32m}[39m
+10:52:23 [[32minfo[39m] [32m{[39m
+[32m  event: 'preview_start',[39m
+[32m  url: 'https://pin.it/3AIT91YCQ',[39m
+[32m  quality: 'medium',[39m
+[32m  ip: '::1',[39m
+[32m  requestId: 'c89df677-94fc-4665-8835-f81b4ab14f79'[39m
+[32m}[39m
+10:52:31 [[32minfo[39m] [32m{[39m
+[32m  event: 'preview_complete',[39m
+[32m  requestId: 'c89df677-94fc-4665-8835-f81b4ab14f79'[39m
+[32m}[39m
