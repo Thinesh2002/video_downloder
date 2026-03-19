@@ -23,7 +23,17 @@ function detectPlatform(url) {
 function runYtDlp(args, timeout = 30000) {
   return new Promise((resolve, reject) => {
 
-    const proc = spawn("/usr/bin/yt-dlp", args)
+const defaultArgs = [
+  "--no-playlist",
+  "--user-agent",
+  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36",
+  "--add-header",
+  "Accept-Language:en-US,en;q=0.9",
+  "--add-header",
+  "Referer:https://www.google.com/",
+]
+
+const proc = spawn("/usr/bin/yt-dlp", [...defaultArgs, ...args])
 
     let stdout = ""
     let stderr = ""
