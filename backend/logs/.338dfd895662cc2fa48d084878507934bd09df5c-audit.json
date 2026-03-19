@@ -1,0 +1,15 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 14
+    },
+    "auditLog": "C:\\Users\\thine\\Desktop\\Development\\video downloder\\backend\\logs\\.338dfd895662cc2fa48d084878507934bd09df5c-audit.json",
+    "files": [
+        {
+            "date": 1773897494726,
+            "name": "C:\\Users\\thine\\Desktop\\Development\\video downloder\\backend\\logs\\app-2026-03-19.log",
+            "hash": "4ad8b54540d891744e178e4bcbcc5117b0925081deb37bfdd67b88041c5e3c7a"
+        }
+    ],
+    "hashType": "sha256"
+}
