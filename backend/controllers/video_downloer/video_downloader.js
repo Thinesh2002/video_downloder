@@ -10,9 +10,6 @@ const fs = require("fs")
 
 const DOWNLOADS_DIR = path.join(__dirname, "../downloads")
 
-// ==========================
-// COMMON VALIDATOR
-// ==========================
 const validateUrl = (url) => {
   try {
     new URL(url)
@@ -22,9 +19,6 @@ const validateUrl = (url) => {
   }
 }
 
-// ==========================
-// SIMPLE RATE LIMIT (IP)
-// ==========================
 const rateLimitMap = new Map()
 const LIMIT = 15
 const WINDOW = 60 * 1000
@@ -44,9 +38,6 @@ const checkRateLimit = (ip) => {
   return true
 }
 
-// ==========================
-// VIDEO INFO
-// ==========================
 exports.videoInfo = async (req, res) => {
   const { url } = req.query
   const ip = req.ip
@@ -79,9 +70,6 @@ exports.videoInfo = async (req, res) => {
   }
 }
 
-// ==========================
-// GET DIRECT URL
-// ==========================
 exports.getUrl = async (req, res) => {
   const { url, quality = "best", format = "mp4" } = req.body
   const ip = req.ip
@@ -133,9 +121,6 @@ exports.getUrl = async (req, res) => {
   }
 }
 
-// ==========================
-// DOWNLOAD VIDEO (IMPROVED)
-// ==========================
 exports.downloadVideo = async (req, res) => {
   const { url, quality = "best", format = "mp4" } = req.body
   const ip = req.ip
@@ -187,9 +172,6 @@ exports.downloadVideo = async (req, res) => {
   }
 }
 
-// ==========================
-// CLEANUP
-// ==========================
 exports.cleanup = (req, res) => {
   try {
     cleanOldFiles(DOWNLOADS_DIR)

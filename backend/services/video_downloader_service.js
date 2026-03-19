@@ -2,6 +2,8 @@ const { spawn } = require("child_process")
 const path = require("path")
 const fs = require("fs")
 
+const YTDLP_PATH = "/usr/bin/yt-dlp"
+
 const PLATFORMS = {
   youtube: /youtube\.com|youtu\.be/,
   instagram: /instagram\.com/,
@@ -22,18 +24,17 @@ function detectPlatform(url) {
 
 function runYtDlp(args, timeout = 30000) {
   return new Promise((resolve, reject) => {
+    const defaultArgs = [
+      "--no-playlist",
+      "--user-agent",
+      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36",
+      "--add-header", "Accept-Language:en-US,en;q=0.9",
+      "--add-header", "Referer:https://www.google.com/",
+      "--geo-bypass",
+      "--geo-bypass-country", "US"
+    ]
 
-const defaultArgs = [
-  "--no-playlist",
-  "--user-agent",
-  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36",
-  "--add-header",
-  "Accept-Language:en-US,en;q=0.9",
-  "--add-header",
-  "Referer:https://www.google.com/",
-]
-
-const proc = spawn("/usr/bin/yt-dlp", [...defaultArgs, ...args])
+    const proc = spawn(YTDLP_PATH, [...defaultArgs, ...args])
 
     let stdout = ""
     let stderr = ""
@@ -51,18 +52,21 @@ const proc = spawn("/usr/bin/yt-dlp", [...defaultArgs, ...args])
       stderr += data.toString()
     })
 
+    proc.on("error", err => {
+      clearTimeout(timer)
+      reject(new Error("Failed to start yt-dlp: " + err.message))
+    })
+
     proc.on("close", code => {
       clearTimeout(timer)
       if (code === 0) resolve(stdout)
       else reject(new Error(stderr || "yt-dlp failed"))
     })
-
   })
 }
 
 exports.getVideoInfo = async (url) => {
-
-  const output = await runYtDlp(["--dump-json", "--no-playlist", url])
+  const output = await runYtDlp(["--dump-json", url])
   const info = JSON.parse(output)
 
   return {
@@ -86,7 +90,6 @@ exports.getVideoInfo = async (url) => {
 }
 
 exports.getVideoUrl = async (url, quality = "best") => {
-
   const platform = detectPlatform(url)
 
   if (platform === "unknown") {
@@ -107,7 +110,6 @@ exports.getVideoUrl = async (url, quality = "best") => {
     "-f",
     format,
     "--get-url",
-    "--no-playlist",
     url
   ])
 
@@ -123,7 +125,6 @@ exports.getVideoUrl = async (url, quality = "best") => {
 }
 
 exports.downloadToServer = async (url, quality = "best", outputDir = "./downloads") => {
-
   const platform = detectPlatform(url)
 
   if (platform === "unknown") {
@@ -150,9 +151,7 @@ exports.downloadToServer = async (url, quality = "best", outputDir = "./download
   await runYtDlp([
     "-f",
     format,
-    "--merge-output-format",
-    "mp4",
-    "--no-playlist",
+    "--merge-output-format", "mp4",
     "-o",
     outputTemplate,
     url
@@ -178,7 +177,6 @@ exports.downloadToServer = async (url, quality = "best", outputDir = "./download
 }
 
 exports.cleanOldFiles = (outputDir = "./downloads", maxAgeMs = 30 * 60 * 1000) => {
-
   if (!fs.existsSync(outputDir)) return
 
   const now = Date.now()
